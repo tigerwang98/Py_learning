@@ -27,6 +27,8 @@ def A(name, age):
 def C(name, age):
     print('Hello! %s' % name)
 
+
+
 if __name__ == '__main__':
     A(name='Bob', age=18)
     C(name='Lily', age=20)
