@@ -1,8 +1,9 @@
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import binascii
-import requests
+import requests,json
 from hashlib import md5
+import base64
 
 def create(info):
     keys = b'asdzxc123suitang'
@@ -35,63 +36,93 @@ def myself_test_aes():
     unpad_data = unpad(decry_data, 16)
     print('明文：', unpad_data.decode())
 
-def shizhan():
-    url = 'https://www.zlkt.net/training/jscrack/aes01/login?CourseId=1&BarId=11'
-    header = {
-        'Cookie': 'zhiliao_website=bcbb089c6f27e1da40e6610a93b5bc29; _xsrf=OUxhdWFPWmYwZDdYWWsyRjhRUUhQaDMyR0VYdnZSMXA=|1622771040703842616|50cbb1d9f072ea11b4792dd7ba010db05ccbd2c494f76053d7f71da6ba6678dd',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'X-Xsrftoken': '9LauaOZf0d7XYk2F8QQHPh32GEXvvR1p',
-    }
-    param = {
-        'username': 'zhiliao',
-        'password': make_encry_data1('123456')
-    }
-    resp = requests.post(url=url, headers=header, data=param).json()
-    print(resp)
 
-def make_encry_data1(info):
-    key = b'ABC34FG91JKL58NO'
-    iv = b'fajklsfjsdow1238'
-    aes_obj = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
-    pad_data = pad(info.encode(), 16)
-    ecrypted_data = aes_obj.encrypt(pad_data)
-    return binascii.b2a_hex(ecrypted_data).decode()
+class ZlktSpider():
+    def __init__(self):
+        url = 'https://www.zlkt.net/'
+        self.header = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        }
+        sess = requests.Session()
+        sess.get(url=url, headers=self.header)
+        self.header['Cookie'], self.header['X-Xsrftoken'] = self.handle_cookie(sess.cookies.get_dict())
 
-def make_encry_data2(info):
-    key = b'ABC34FG91JKL58NO'
-    iv = b'fajklsfjsdow1238'
-    aes_obj = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
-    pad_data = pad(info.encode(), 16)
-    ecrypted_data = aes_obj.encrypt(pad_data)
-    aes_data = binascii.b2a_hex(ecrypted_data)
-    md5_data = md5(aes_data)
-    # print(md5_data.hexdigest())
-    return md5_data.hexdigest()
+    def handle_cookie(self, cookie_dict):
+        cookie = ''
+        for k, v in cookie_dict.items():
+            cookie = cookie + str(k) + '=' + str(v) + ';'
+        base64_token = cookie_dict['_xsrf'].split('|')[0]
+        token = base64.b64decode(base64_token).decode()
+        return cookie, token
 
-def shizhan2():
-    pwd1 = make_encry_data1('wanghu123')
-    # print('*'*30)
-    pwd2 = make_encry_data2('wanghu123')
-    url = 'https://www.zlkt.net/training/jscrack/aes02/register?CourseId=1&BarId=12'
-    header = {
-        'Cookie': 'zhiliao_website=bcbb089c6f27e1da40e6610a93b5bc29; _xsrf=ZGptU2hROHFvNTdodUNrTXZ2dEN2bmhIVnBheDhuN2w=|1622775124298538551|2884370d23383930dcb2d6bc5e7ea5c98680c156349d924330d0dd8a43a5cef8',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
-        'X-Xsrftoken': 'djmShQ8qo57huCkMvvtCvnhHVpax8n7l',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    }
-    param = {
-        'username': '18683108304',
-        'password1': pwd1,
-        'password2': pwd2,
-    }
-    resp = requests.post(url=url, headers=header, data=param)
-    print(resp.text)
+    def login(self, username, password):
+        url = 'https://www.zlkt.net/signin/do'
+        param = {
+            'Email': username,
+            'Password': password,
+        }
+        ret = requests.post(url=url, headers=self.header, data=param)
+        try:
+            ret.json()
+            print('登录知了课堂成功！')
+        except:
+            print('登录知了课堂失败！')
+            raise Exception
+
+    def shizhan(self):
+        url = 'https://www.zlkt.net/training/jscrack/aes01/login?CourseId=1&BarId=11'
+        param = {
+            'username': 'zhiliao',
+            'password': self.shizhan1_make_encry_data('111111')
+        }
+        resp = requests.post(url=url, headers=self.header, data=param)
+        print(resp.text)
+
+    def shizhan1_make_encry_data(self, psword):
+        key = b'ABC34FG91JKL58NO'
+        aes_obj = AES.new(key=key, mode=AES.MODE_ECB)
+        pad_data = pad(psword.encode(), 16)
+        ecrypted_data = aes_obj.encrypt(pad_data)
+        return binascii.b2a_hex(ecrypted_data).decode()
+
+    def make_encry_data1(self, info):
+        key = b'ABC34FG91JKL58NO'
+        iv = b'fajklsfjsdow1238'
+        aes_obj = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
+        pad_data = pad(info.encode(), 16)
+        ecrypted_data = aes_obj.encrypt(pad_data)
+        return binascii.b2a_hex(ecrypted_data).decode()
+
+    def make_encry_data2(self, info):
+        key = b'ABC34FG91JKL58NO'
+        iv = b'fajklsfjsdow1238'
+        aes_obj = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
+        pad_data = pad(info.encode(), 16)
+        ecrypted_data = aes_obj.encrypt(pad_data)
+        aes_data = binascii.b2a_hex(ecrypted_data)
+        md5_data = md5(aes_data)
+        return md5_data.hexdigest()
+
+    def shizhan2(self):
+        pwd1 = self.make_encry_data1('wanghu123')
+        pwd2 = self.make_encry_data2('wanghu123')
+        url = 'https://www.zlkt.net/training/jscrack/aes02/register?CourseId=1&BarId=12'
+        param = {
+            'username': '18683108304',
+            'password1': pwd1,
+            'password2': pwd2,
+        }
+        resp = requests.post(url=url, headers=self.header, data=param)
+        print(resp.text)
 
 if __name__ == "__main__":
-    # info = b'test AES shifou keyong'
-    # encrypt_data = create(info)
-    # decrypt(encrypt_data)
-    # myself_test_aes()
-    shizhan2()
-    # a = make_encry_data1('123456')
-    # print(a)
+    usrname = 'lyfshiwoer@163.com'
+    psword = '19980207abc'
+    obj = md5()
+    obj.update(psword.encode())
+    psword = obj.hexdigest()
+    spider = ZlktSpider()
+    spider.login(usrname, psword)
+    spider.shizhan()
+    spider.shizhan2()
