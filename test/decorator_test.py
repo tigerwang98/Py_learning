@@ -5,6 +5,16 @@
 @author= wanghu
 @create_time = 2021/7/29 15:15
 """
+'''
+闭包： 就是函数，但是与普通函数的区别是可以访问“外部”的变量，以完成封装的功能 如：
+def A(name):
+    def B():
+        print(name)     # 这里使用了A里面的name
+        return B()
+-----------------------------------------------------------------------------------
+
+
+'''
 import time
 
 def B(level):
@@ -26,8 +36,6 @@ def A(name, age):
 @B(level='DEBUG')
 def C(name, age):
     print('Hello! %s' % name)
-
-
 
 if __name__ == '__main__':
     A(name='Bob', age=18)
