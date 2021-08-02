@@ -46,6 +46,7 @@ def login():
 }
     res = requests.post(url=url, headers=header, data=json.dumps(param))
     print('===================登录信息=========================')
+    print(res.json())
     return res.json()['ext']['userid']
 
 def genearate_random_time():
