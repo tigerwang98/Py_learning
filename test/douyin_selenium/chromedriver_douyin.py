@@ -67,6 +67,7 @@ class DriverDouYin():
             logging.info('写入文件失败！请检查原因！')
             return False
 
+    # 保存验证码
     def save_imgs(self, bg_img_url, slide_img_url):
         logging.info('开始保存验证码图片......')
         bg_res = requests.get(bg_img_url, headers=self.header)
@@ -82,6 +83,7 @@ class DriverDouYin():
         else:
             return False
 
+    # 获取验证码需要移动的距离
     def get_validate_param(self, backgroundImg, validateImg):
         bg_img = cv2.imread(backgroundImg)
         tp_img = cv2.imread(validateImg)
@@ -99,7 +101,6 @@ class DriverDouYin():
         cv2.imwrite('./capture_imgs/find_location.png', bg_img)  # 保存在本地
         x = (max_loc[0] // 1.623529)
         return x
-
 
     # 进行验证码验证操作
     def drag_and_drop(self, offset):
@@ -143,14 +144,15 @@ class DriverDouYin():
         time.sleep(0.5)
         action.release().perform()
 
+    # 彻底关闭chromedriver
     def close(self,):
         time.sleep(2)
-        self.drvier.close()
         self.drvier.quit()
         logging.info('chromedriver 已经退出！')
         sys.exit(1)
 
-    def parse_html(self, page_source):
+    # 解析首页html
+    def parse_index_html(self, page_source):
         html = etree.HTML(page_source)
         for li in html.xpath('//ul[@class="f3f8d90bfdc74a44ab0cbe784a4af104-scss"]//li'):
             detail_href = li.xpath('./div[1]//a[2]/@href')[0]
@@ -159,6 +161,55 @@ class DriverDouYin():
             pubtime = li.xpath('.//div[@class="d8d25680ae6956e5aa7807679ce66b7e-scss"]//span[@class="b32855717201aaabd3d83c162315ff0a-scss"]//text()')[0]
             print(title, author, pubtime, detail_href)
 
+    def parse_search_html(self, page_source):
+        html = etree.HTML(page_source)
+        count = 0
+        ul = html.xpath('//ul[@class="_3636d166d0756b63d5645bcd4b9bcac4-scss"]')[0]
+        for li in ul.xpath('.//li'):
+            count += 1
+            url = li.xpath('.//div[@class="_863f6ea4f8ed8c3f88c51527f1ea8d43-scss"]//a[2]/@href')[0]
+            title = li.xpath('.//div[@class="_863f6ea4f8ed8c3f88c51527f1ea8d43-scss"]//a[2]//p//span//text()')[0]
+            author = li.xpath('.//div[@class="d8d25680ae6956e5aa7807679ce66b7e-scss"]/a/p//span//text()')[0]
+            pubtime = li.xpath('.//div[@class="d8d25680ae6956e5aa7807679ce66b7e-scss"]/span//text()')[0]
+            print('%s.'% count, title, author, pubtime, url)
+
+    def keyword_search(self, keyword):
+        logging.info('正在根据关键字搜索相关视频......')
+        WebDriverWait(self.drvier, 5).until(EC.presence_of_all_elements_located((By.XPATH, '//input[@class="_28bcf0c81eecec324dc834fd9da6bc14-scss _995df5bec116ef593426dbf2a410fa26-scss"]')))[0].send_keys(keyword)
+        search_button = WebDriverWait(self.drvier, 5).until(EC.presence_of_all_elements_located((By.XPATH, '//button[@class="_913d1e3dbc906c79f2227a5d1a6e4d6c-scss"]')))[0]
+        search_button.click()
+        self.drvier.switch_to.window(self.drvier.window_handles[1])
+        time.sleep(3)
+        return self.drvier.page_source
+
+    def scroll_curPage(self):
+        logging.info('获取下一页数据中......')
+        self.drvier.maximize_window()
+        scroll_script = 'window.scrollBy(0, 127)'
+        for i in range(4):
+            print('====================================')
+            print(self.drvier.page_source)
+            print('====================================')
+            self.drvier.execute_script(scroll_script)
+            time.sleep(2)
+
+    def start(self):
+        pass
+
+class ParsePageSource():
+    def __init__(self):
+        pass
+
+    @property
+    def page_source(self):
+        return self.page_source
+
+    @page_source.setter
+    def page_source(self, page):
+        self.page_source = etree.HTML(page)
+
+    def start(self):
+        pass
 
 if __name__ == '__main__':
     logging.info('抖音爬虫开始！')
@@ -166,5 +217,7 @@ if __name__ == '__main__':
     bg_img_path, slide_img_path = spider.get_img_info()
     move_distance = spider.get_validate_param(bg_img_path, slide_img_path)
     page_source = spider.drag_and_drop(move_distance)
-    spider.parse_html(page_source)
+    page = spider.keyword_search('川麻婷婷妹')
+    # spider.scroll_curPage()
+    spider.parse_search_html(page)
     spider.close()
