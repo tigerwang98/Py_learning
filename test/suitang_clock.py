@@ -28,7 +28,8 @@ def send_request(sign_time, uid):
     "details_attend_longitude": "103.99159613715278",
     "details_attend_latitude": "30.633617621527776",
     "details_attend_date": today,
-    "details_attend_time": sign_time,
+    # "details_attend_time": sign_time,
+    "details_attend_time": now_time,
     "details_attend_name": "四川省成都市武侯区武兴一路8号",
     "details_attend_reason": "",
     "login_dev": "HUAWEIELS-AN00"
