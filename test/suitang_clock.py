@@ -10,8 +10,6 @@ import datetime, time
 import random,json
 
 today = datetime.datetime.now().strftime('%Y-%m-%d')
-now_time = datetime.datetime.now().strftime('%H:%M:%S')
-
 header = {
         'Host': 'work.cninct.com',
         'User-Agent': 'Mozilla/5.0 (Linux; Android 11; ELS-AN00 Build/HUAWEIELS-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045409 Mobile Safari/537.36 MMWEBID/7469 MicroMessenger/8.0.7.1920(0x27001335) Process/tools WeChat/arm64 NetType/WIFI Language/zh_CN ABI/arm64',
@@ -28,8 +26,7 @@ def send_request(sign_time, uid):
     "details_attend_longitude": "103.99159613715278",
     "details_attend_latitude": "30.633617621527776",
     "details_attend_date": today,
-    # "details_attend_time": sign_time,
-    "details_attend_time": now_time,
+    "details_attend_time": sign_time,
     "details_attend_name": "四川省成都市武侯区武兴一路8号",
     "details_attend_reason": "",
     "login_dev": "HUAWEIELS-AN00"
@@ -51,16 +48,23 @@ def login():
     return res.json()['ext']['userid']
 
 def genearate_random_time():
-    random_s = random.randint(10, 59)
-    if now_time < '09:00:00':
-        random_min = random.randint(50, 59)
-        sign_time = '08:%s:%s' % (random_min, random_s)
-    else:
-        random_min = random.randint(10, 20)
-        sign_time = '18:%s:%s' % (random_min, random_s)
+    # random_s = random.randint(10, 59)
+    now_time = datetime.datetime.now().strftime('%H:%M:%S')
+    # if now_time < '09:00:00':
+    #     random_min = random.randint(50, 59)
+    #     sign_time = '08:%s:%s' % (random_min, random_s)
+    # else:
+    #     random_min = random.randint(10, 20)
+    #     sign_time = '18:%s:%s' % (random_min, random_s)
+    sign_time = now_time
     return sign_time
 
+def gener_random_time():
+    sleep_time = random.randint(20, 250)
+    time.sleep(sleep_time)
+
 if __name__ == '__main__':
+    gener_random_time()
     userid = login()
     time.sleep(1)
     sign_time = genearate_random_time()
