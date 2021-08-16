@@ -8,6 +8,7 @@
 import requests
 import datetime, time
 import random,json
+import sys
 
 today = datetime.datetime.now().strftime('%Y-%m-%d')
 header = {
@@ -50,16 +51,18 @@ def login():
 def genearate_random_time():
     # random_s = random.randint(10, 59)
     now_time = datetime.datetime.now().strftime('%H:%M:%S')
-    # if now_time < '09:00:00':
-    #     random_min = random.randint(50, 59)
-    #     sign_time = '08:%s:%s' % (random_min, random_s)
-    # else:
-    #     random_min = random.randint(10, 20)
-    #     sign_time = '18:%s:%s' % (random_min, random_s)
-    sign_time = now_time
+    if now_time < '08:30:00':
+        print('现在不是打卡时间！')
+        sys.exit(0)
+    elif now_time > '18:30:00':
+        print('现在不是打卡时间！')
+        sys.exit(0)
+    else:
+        sign_time = now_time
     return sign_time
 
 def gener_random_time():
+    print('开始等待...')
     sleep_time = random.randint(20, 250)
     time.sleep(sleep_time)
 
