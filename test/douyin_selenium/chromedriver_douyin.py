@@ -221,3 +221,4 @@ if __name__ == '__main__':
     # spider.scroll_curPage()
     spider.parse_search_html(page)
     spider.close()
+

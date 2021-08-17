@@ -51,6 +51,10 @@ def login():
 def genearate_random_time():
     # random_s = random.randint(10, 59)
     now_time = datetime.datetime.now().strftime('%H:%M:%S')
+    return now_time
+
+def gener_random_time():
+    now_time = datetime.datetime.now().strftime('%H:%M:%S')
     if now_time < '08:30:00':
         print('现在不是打卡时间！')
         sys.exit(0)
@@ -58,13 +62,9 @@ def genearate_random_time():
         print('现在不是打卡时间！')
         sys.exit(0)
     else:
-        sign_time = now_time
-    return sign_time
-
-def gener_random_time():
-    print('开始等待...')
-    sleep_time = random.randint(20, 250)
-    time.sleep(sleep_time)
+        print('开始等待...')
+        sleep_time = random.randint(20, 250)
+        time.sleep(sleep_time)
 
 if __name__ == '__main__':
     gener_random_time()
