@@ -17,3 +17,27 @@ LIST_BASE_URL = 'https://weixin.sogou.com/weixin?'
 DETAIL_BASE_URL = 'https://weixin.sogou.com'
 # 要抓取的页数
 PAGE = 10
+# 代理配置
+proxy_host = "u5694.20.tp.16yun.cn"
+proxy_port = "6447"
+proxy_user = "16NPHKSJ"
+proxy_pass = "287149"
+def get_16yun():
+    proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
+        "host": proxy_host,
+        "port": proxy_port,
+        "user": proxy_user,
+        "pass": proxy_pass,
+    }
+    proxies = {
+        "https": proxyMeta
+    }
+    return proxies
+# 数据库配置
+HOST = 'localhost'
+USER = 'root'
+PASSWORD = '123456'
+DATABASE = 'test'
+DB_CHARSET = 'utf8'
+# splash配置
+SPLASH_URL = 'http://192.168.1.213:8050/execute?lua_source='
