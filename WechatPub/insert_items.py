@@ -7,6 +7,8 @@
 """
 from WechatPub.CONFIG import *
 import pymysql
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class Items():
     def __init__(self):
@@ -14,15 +16,16 @@ class Items():
         self.cur = self.conn.cursor()
 
     def insertItem(self, item):
-        title = item['title']
+        title = self.addslashes(item['title'])
         author = item['author']
         pubitme = item['pubtime']
         content = item['abstract']
         url = item['url']
-        info = item['info']
-        sql = '''INSERT INTO `WechatPub` (title, author, content, url, info) VALUES ("%s", "%s", "%s", "%s", "%s", "%s")''' % (title, author, pubitme, content, url, info)
+        info = self.addslashes(item['info'])
+        sql = '''INSERT INTO `WechatPub` (title, author, pubtime, content, url, info) VALUES ("%s", "%s", "%s", "%s", "%s", "%s")''' % (title, author, pubitme, content, url, info)
         self.cur.execute(sql)
         self.conn.commit()
+        logging.info('插入成功！')
 
     def commit_db(self):
         self.conn.commit()
@@ -32,3 +35,10 @@ class Items():
     def close(self):
         self.cur.close()
         self.conn.close()
+
+    def addslashes(self, s):
+        l = ["\\", '"', "'", "\0", ]
+        for i in l:
+            if i in s:
+                s = s.replace(i, '\\' + i)
+        return s

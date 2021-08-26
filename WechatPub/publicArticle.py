@@ -101,7 +101,6 @@ class WeixinPub():
             logging.info('开始获取%s公众号的第%s页' % (author, pg+1))
             url = self.get_start_url(author, page=(pg+1))
             logging.info('当前的列表页url是%s' % url)
-            time.sleep(3)
             logging.info('开始解析当前页面... ...')
             page_source = self.get_list(url=url)
             datas = self.parse_list_detail(page_source)
