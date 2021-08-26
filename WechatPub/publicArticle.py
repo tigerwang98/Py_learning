@@ -96,7 +96,7 @@ class WeixinPub():
         with open(self.url_configs, 'r', encoding='utf-8') as f:
             authors = f.readlines()
         logging.info('作者列表读取成功！')
-        author = authors.pop(0).strip('\n') if len(authors) > 0 else self.quit()
+        author = authors.pop(0).strip('\n') if len(authors) > 0 else self.close()
         for pg in range(PAGE):
             logging.info('开始获取%s公众号的第%s页' % (author, pg+1))
             url = self.get_start_url(author, page=(pg+1))
