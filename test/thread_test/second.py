@@ -53,7 +53,7 @@ if __name__ == '__main__':
     th = []
     mutex = threading.Lock()
 
-    for i in range(1, 3):
+    for i in range(1, 10):
         th.append(threading.Thread(target=run, args=(i, mutex)))
     for t in th:
         t.start()
