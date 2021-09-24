@@ -9,8 +9,11 @@ import scrapy
 class CrawlspiderTestItem(scrapy.Item):
     # define the fields for your item here like:
     title = scrapy.Field()
-    author = scrapy.Field()
     pubtime = scrapy.Field()
-    content = scrapy.Field()
-    fileurl = scrapy.Field()
-    outurl = scrapy.Field()
+    area_id = scrapy.Field()
+    city_id = scrapy.Field()
+    author = scrapy.Field()
+    url = scrapy.Field()
+    add_time = scrapy.Field()
+    info = scrapy.Field()
+    file_url = scrapy.Field()

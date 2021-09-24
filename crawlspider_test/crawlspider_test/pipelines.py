@@ -7,7 +7,6 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 from twisted.enterprise import adbapi
-from time import time
 
 class CrawlspiderTestPipeline:
     def __init__(self, mysql_config):
@@ -18,7 +17,9 @@ class CrawlspiderTestPipeline:
             user=mysql_config['USER'],
             password=mysql_config['PASSWORD'],
             db=mysql_config['DATABASE'],
-            charset='utf8'
+            charset='utf8',
+            cp_max=10,
+            cp_reconnect=True,
         )
 
     @classmethod
@@ -27,10 +28,18 @@ class CrawlspiderTestPipeline:
         return cls(mysql_config)
 
     def process_item(self, item, spider):
-        self.db.runInteraction(self.insert_item, item)
+        query = self.db.runInteraction(self.insert_item, item)
         return item
 
     def insert_item(self, cursor, item):
-        sql = '''INSERT INTO `scrapy_test`(id, title, author, pubtime, outurl, fileurl, content, addtime) VALUES(null, %s, %s, %s, %s, %s,%s, %s) '''
-        args = (item['title'], item['author'], item['pubtime'], item['outurl'], item['fileurl'], item['content'], int(time()))
-        cursor.execute(sql, args)
+        file_url = item['file_url']
+        infos = item['info']
+        sql_zixun = '''INSERT INTO `stang_zixun`(title, pubtime, area_id, city_id, author, url, addtime) VALUES(%s, %s, %s, %s, %s, %s, %s) '''
+        sql_zixun_file = '''INSERT INTO `stang_zixun_file`(forid, file_url) VALUES(%s, %s)'''
+        sql_zixun_info = '''INSERT INTO `stang_zixun_info`(forid, info) VALUES(%s, %s)'''
+        args = (item['title'], item['pubtime'], item['area_id'], item['city_id'], item['author'], item['url'], item['add_time'])
+        cursor.execute(sql_zixun, args)
+        forid = cursor.lastrowid
+        cursor.execute(sql_zixun_info, (forid, infos))
+        if file_url:
+            cursor.execute(sql_zixun_file, (forid, file_url))

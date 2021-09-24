@@ -6,6 +6,8 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import datetime
+import time
 
 BOT_NAME = 'crawlspider_test'
 
@@ -20,7 +22,7 @@ NEWSPIDER_MODULE = 'crawlspider_test.spiders'
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -45,14 +47,14 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-SPIDER_MIDDLEWARES = {
-   'crawlspider_test.middlewares.CrawlspiderTestSpiderMiddleware': 543,
-}
+# SPIDER_MIDDLEWARES = {
+#    'crawlspider_test.middlewares.crawlspiderTestSpiderMiddleware': 543,
+# }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'crawlspider_test.middlewares.CrawlspiderTestDownloaderMiddleware': 543,
+   'crawlspider_test.middlewares.ProxyMiddleware': 100,
 }
 
 # Enable or disable extensions
@@ -64,8 +66,8 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'crawlspider_test.pipelines.CrawlspiderTestPipeline': 300,
-    # 'scrapy_redis.pipelines.RedisPipeline': 300,
+   # 'crawlspider_test.pipelines.CrawlspiderTestPipeline': 300,
+    'scrapy_redis.pipelines.RedisPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -82,24 +84,29 @@ ITEM_PIPELINES = {
 #AUTOTHROTTLE_DEBUG = False
 
 # Redis settings
+# REDIS_URL = '127.0.0.1:6379'
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
-SCHEDULER = 'scrapy_redis_bloomfilter.scheduler.Scheduler'
-DUPEFILTER_CLASS = "scrapy_redis_bloomfilter.dupefilter.RFPDupeFilter"
-SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
-# 散列函数的个数,个人偏向设置为10,不设置则默认为6
-BLOOMFILTER_HASH_NUMBER = 6
-# Bloom Filter的bit参数，默认30(一亿级指纹池)
-BLOOMFILTER_BIT = 30
-SCHEDULER_PERSIST = True
+SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
+# DUPEFILTER_KEY = 'Sichuan_envinronment'  # 调度器中请求存放在redis中的key
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'  # 默认使用优先级队列（默认），其他：PriorityQueue（有序集合），FifoQueue（列表）、LifoQueue（列表）
+# SCHEDULER_QUEUE_KEY = '%(spider)s:requests'  # 调度器中请求存放在redis中的key
+# SCHEDULER_SERIALIZER = "scrapy_redis.picklecompat"  # 对保存到redis中的数据进行序列化，默认使用pickle
+SCHEDULER_PERSIST = True   # 是否在关闭时候保留原来的调度器和去重记录，True=保留，False=清空
+# SCHEDULER_FLUSH_ON_START = False  # 是否在开始之前清空 调度器和去重记录，True=清空，False=不清空
+# SCHEDULER_IDLE_BEFORE_CLOSE = 10  # 去调度器中获取数据时，如果为空，最多等待时间（最后没数据，未获取到）
+# SCHEDULER_DUPEFILTER_KEY = '%(spider)s:dupefilter'  # 去重规则，在redis中保存时对应的key
+DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'  # 去重规则对应处理的类
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
-#HTTPCACHE_ENABLED = True
-#HTTPCACHE_EXPIRATION_SECS = 0
-#HTTPCACHE_DIR = 'httpcache'
-#HTTPCACHE_IGNORE_HTTP_CODES = []
-#HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+# HTTPCACHE_ENABLED = True
+# HTTPCACHE_EXPIRATION_SECS = 0
+# HTTPCACHE_DIR = 'httpcache'
+# HTTPCACHE_IGNORE_HTTP_CODES = []
+# HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
 MYSQL_CONFIG = {
     'DRIVER': 'pymysql',
     'HOST': '127.0.0.1',
@@ -108,3 +115,13 @@ MYSQL_CONFIG = {
     'USER': 'root',
     'PASSWORD': '123456'
 }
+# 日志文件配置
+LOG_LEVEL = 'DEBUG'
+today = datetime.datetime.now()
+# 代理配置
+proxy_host = "u5694.20.tp.16yun.cn"
+proxy_port = "6447"
+proxy_user = "16NPHKSJ"
+proxy_pass = "287149"
+# 缺少的xpath错误日志记录路径
+ERR_LOG_PATH = r'C:\\Users\\123\\Desktop\\Py_learing\\crawlspider_test\\logs\\err_log\\scrapy_{}_{}_{}.txt'.format(today.year, today.month, today.day)
