@@ -23,7 +23,6 @@ logging.basicConfig(level=logging.INFO)
 
 class ZhiYiYun():
     def __init__(self, date):
-        # self.today = str(datetime.now()).split(' ')[0]
         self.date = date
         self.file_path = r'C:\Users\123\Desktop\贵安诊所门诊日志\贵安诊所_%s.xlsx' % self.date
         self.createExcel()
@@ -31,7 +30,6 @@ class ZhiYiYun():
         self.conn, self.cur, self.redis_conn = self.initDatabase()
         self.userToken = self.getUserToken()
         self.zhensuoID = '8a990d915cc0b3f4015d2b57a0dd04d1'
-        self.isFilter = False
 
     @property
     def get_cur_time(self):
@@ -325,19 +323,26 @@ class ZhiYiYun():
         self.exit()
         # os.startfile(self.file_path, 'print')
 
-def generate_date():
-    for month in range(6, 10):
-        for day in range(1, 32):
+def generate_date(start_date, end_date):
+    start_year = int(start_date.split('-')[0])
+    start_month = int(start_date.split('-')[1])
+    start_day = int(start_date.split('-')[2])
+    end_year = int(end_date.split('-')[0])
+    end_month = int(end_date.split('-')[1])
+    end_day = int(end_date.split('-')[2])
+    for month in range(start_month, end_month + 1):
+        for day in range(start_day, end_day + 1):
             if month in [6, 9] and day == 31:
                 continue
             if day < 10:
                 day = '0' + str(day)
-            date = '2021-0%s-%s' % (month, day)
+            date = '2021-%s-%s' % (month, day)
             yield date
 
 
 if __name__ == '__main__':
-    # for date in  generate_date():
-        date = '2021-10-11'
+    start_date = input('请输入起始时间:')
+    end_date = input('请输入截止时间:')
+    for date in generate_date(start_date, end_date):
         t = ZhiYiYun(date)
         t.run()
