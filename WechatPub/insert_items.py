@@ -5,6 +5,8 @@
 @author= wanghu
 @create_time = 2021/8/25 10:46
 """
+import time
+
 from WechatPub.CONFIG import *
 import pymysql
 import logging
@@ -22,7 +24,7 @@ class Items():
         content = item['abstract']
         url = item['url']
         info = self.addslashes(item['info'])
-        sql = '''INSERT INTO `WechatPub` (title, author, pubtime, content, url, info) VALUES ("%s", "%s", "%s", "%s", "%s", "%s")''' % (title, author, pubitme, content, url, info)
+        sql = '''INSERT INTO `WechatPub` (title, author, pubtime, content, url, info, add_time) VALUES ("%s", "%s", "%s", "%s", "%s", "%s", %s)''' % (title, author, pubitme, content, url, info, int(time.time()))
         self.cur.execute(sql)
         self.conn.commit()
         logging.info('插入成功！')

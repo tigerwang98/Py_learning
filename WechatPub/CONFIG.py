@@ -16,7 +16,7 @@ HEADER = {
 LIST_BASE_URL = 'https://weixin.sogou.com/weixin?'
 DETAIL_BASE_URL = 'https://weixin.sogou.com'
 # 要抓取的页数
-PAGE = 10
+PAGE = 3
 # 代理配置
 proxy_host = "u5694.20.tp.16yun.cn"
 proxy_port = "6447"
@@ -38,6 +38,6 @@ HOST = 'localhost'
 USER = 'root'
 PASSWORD = '123456'
 DATABASE = 'test'
-DB_CHARSET = 'utf8'
+DB_CHARSET = 'utf8mb4'
 # splash配置
 SPLASH_URL = 'http://192.168.1.213:8050/execute?lua_source='
