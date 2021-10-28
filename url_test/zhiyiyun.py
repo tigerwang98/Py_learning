@@ -268,8 +268,8 @@ class ZhiYiYun():
         return conn, cursor, redis_conn
 
     def createExcel(self):
-        if os.path.exists(self.file_path):
-           os.remove(self.file_path)
+        if not os.path.exists(self.file_path):
+           os.mkdir("\\".join(self.file_path.split('\\')[:-1]))
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "贵安诊所_%s.xlsx" % self.date
