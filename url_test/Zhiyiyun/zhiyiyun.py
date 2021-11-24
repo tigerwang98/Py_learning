@@ -268,7 +268,7 @@ class ZhiYiYun():
         return conn, cursor, redis_conn
 
     def createExcel(self):
-        if not os.path.exists(self.file_path):
+        if not os.path.exists("\\".join(self.file_path.split('\\')[:-1])):
            os.mkdir("\\".join(self.file_path.split('\\')[:-1]))
         workbook = Workbook()
         sheet = workbook.active
@@ -329,9 +329,13 @@ def generate_date(start_date, end_date):
     start_day = int(start_date.split('-')[2])
     end_year = int(end_date.split('-')[0])
     end_month = int(end_date.split('-')[1])
-    end_day = int(end_date.split('-')[2])
+    end_days = int(end_date.split('-')[2])
     for month in range(start_month, end_month + 1):
-        for day in range(start_day, end_day + 1):
+        days = 30 if start_month in [4, 6, 9, 11] else 31
+        if start_month == 2:
+            days = 28
+        end_day = (end_month - start_month) * days
+        for day in range(start_day, end_day + end_days + 1):
             if month in [6, 9] and day == 31:
                 continue
             if day < 10:
