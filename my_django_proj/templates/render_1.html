@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <style>
+        .nav{
+            top: 25px;
+            right: 0;
+            position: fixed;
+            overflow: hidden;
+            float: right;
+        }
+        .ul{
+            list-style: none;
+            margin: 0 20px;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>比较复杂的template测试</title>
+</head>
+<body>
+<p style="background: green">开始咯!</p>
+
+<div>
+    {% if username == '王虎' %}
+    <p>您好!{{ age }}岁的{{ username }}会员!</p>
+    {% else %}
+    <p>对不起!请先登录!</p>
+    {% endif %}
+    {% with wh=users.1.username %}
+    <p>您好！会员{{ wh }},欢迎登录!</p>
+    {% endwith %}
+</div>
+<div>
+    {% for user in users %}
+        {% for k,v in user.items %}
+            <li>{{ k}}</li>
+            <li>{{ v }}</li>
+        {% endfor %}
+    {% endfor %}
+</div>
+<div class="nav">
+    <p>友情链接</p>
+    <div class="ul">
+        <a href="{% url 'test_django:render' %}">render</a>
+        <a href="{% url 'test_django:denglu' %}">denglu</a>
+        <a href="{% url 'test_django:param' pid='1' %}">param</a>
+        <a href="{% url 'test_django:kw' %}?kw=123456">kw</a>
+        <a href="{% url 'test_django:shouye' %}">shouye</a>
+    </div>
+</div>
+</body>
+</html>

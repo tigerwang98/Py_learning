@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, reverse
+from django.shortcuts import render
 
 # Create your views here.
 def test_param(request, pid):
@@ -19,3 +20,26 @@ def echo_index(request):
 
 def echo_login(request):
     return HttpResponse('这是登录页面！')
+
+def echo_render(request):
+    param = {
+        'user': 'wanghu',
+        'age': '22',
+    }
+    return render(request, 'render.html', context=param)
+
+def echo_com_render(request):
+    param = {
+        'users': [{
+                'username': 'wanghu',
+                'age': 22,
+                'account': 'suitang',
+                'psswd': '123456', },
+             {
+                 'username': '王虎',
+                 'age': 24,
+                 'account': 'suitang123',
+                 'psswd': '123456', },
+            ]
+    }
+    return render(request, 'render_1.html', context=param)

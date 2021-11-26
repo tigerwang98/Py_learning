@@ -14,6 +14,8 @@ app_name = 'test_django'
 urlpatterns = [
     path('index', views.echo_index, name='shouye'),
     path('login', views.echo_login, name='denglu'),
-    path('param/<int:pid>', views.test_param),
-    path('kw', views.test_kw)
+    path('param/<int:pid>', views.test_param, name='param'),
+    path('kw', views.test_kw, name='kw'),
+    path('render', views.echo_render, name='render'),
+    path('render/p/1', views.echo_com_render, name='render_1')
 ]
