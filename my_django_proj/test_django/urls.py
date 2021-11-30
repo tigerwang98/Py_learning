@@ -17,5 +17,6 @@ urlpatterns = [
     path('param/<int:pid>', views.test_param, name='param'),
     path('kw', views.test_kw, name='kw'),
     path('render', views.echo_render, name='render'),
-    path('render/p/1', views.echo_com_render, name='render_1')
+    path('render/p/1', views.echo_com_render, name='render_1'),
+    path('templates', views.echo_template, name='tmplt')
 ]
