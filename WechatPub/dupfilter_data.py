@@ -134,6 +134,7 @@ class RedisFilter():
     def mark_value(self, value):
          self.redis_conn.sadd(self.key_name, value)
 
+# 自定义异常
 class SelectFilterError(Exception):
     def __init__(self):
         super().__init__()
@@ -141,6 +142,12 @@ class SelectFilterError(Exception):
     def __str__(self):
         return 'Filter Error!Please Use \'Bloom\' or \'Redis\''
 
+'''
+* filter_method: 去重的方法
+* filter_name: 去重的文件名或集合名
+* url: 去重的链接
+* dont_filter: 本次调用是否去重
+'''
 def filter_data(filter_method, filter_name, url, dont_filter=False):
     if dont_filter:
         logging.info('请注意!现在处于不去重状态')
