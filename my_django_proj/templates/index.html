@@ -1,0 +1,21 @@
+{% extends 'header.html' %}
+{% block content %}
+    <table>
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>书名</th>
+            <th>作者</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for book in data %}
+            <tr>
+                <td>{{ book.0 }}</td>
+                <td>{{ book.1 }}</td>
+                <td>{{ book.2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

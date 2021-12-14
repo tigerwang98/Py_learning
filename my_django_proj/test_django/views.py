@@ -43,3 +43,6 @@ def echo_com_render(request):
             ]
     }
     return render(request, 'render_1.html', context=param)
+
+def echo_template(request):
+    return render(request, 'tmplt.html')
