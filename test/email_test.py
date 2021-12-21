@@ -14,7 +14,7 @@ mail_user = 'bwai@cninct.com'
 # mail_pass = 'queirsmpdhkabgif'
 mail_pass = 'St123456'
 sender = 'bwai@cninct.com'
-receivers = ['lyfshiwoer@163.com']
+receivers = ['470601193@qq.com']
 
 test_text = '''
 <!DOCTYPE html>
