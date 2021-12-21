@@ -1,15 +1,25 @@
 import re
+import sys
+import time
+
 from dateparser import parse
 import aiohttp
 import asyncio
 import logging
 import elasticsearch
+import time
 logging.basicConfig(level=logging.INFO)
 logger = logging
+index_name = 'book'
 header = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
 }
+es = elasticsearch.Elasticsearch()
 
+def create_index():
+    logger.info('正在创建索引... ...')
+    es.indices.create(index=index_name, ignore=400)
+    logger.info('索引创建成功!')
 
 def get_standard_pubtime(pub_time):
     if not isinstance(pub_time, str):
@@ -29,10 +39,9 @@ def get_standard_pubtime(pub_time):
         raise TypeError
 
 def insert_data(datas):
-
     for data in datas:
-
-
+        result = es.index(index=index_name, document=data)
+        logger.info('%s插入成功!' % data['book_name'])
 
 async def request_book(page):
     logger.info('正在爬取第%s页' % page)
@@ -80,6 +89,7 @@ async def do_request(url):
 
 
 if __name__ == '__main__':
+    create_index()
     loop = asyncio.get_event_loop()
     for page in range(1, 503):
         task = asyncio.ensure_future(request_book(page))
