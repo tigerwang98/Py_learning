@@ -10,6 +10,7 @@ header = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
 }
 
+
 def get_standard_pubtime(pub_time):
     if not isinstance(pub_time, str):
         try:
@@ -28,7 +29,9 @@ def get_standard_pubtime(pub_time):
         raise TypeError
 
 def insert_data(datas):
-    pass
+
+    for data in datas:
+
 
 
 async def request_book(page):
@@ -36,7 +39,7 @@ async def request_book(page):
     url = 'https://spa5.scrape.center/api/book/?limit=18&offset=%s' % (page - 1) * 18
     res = await do_request(url)
     datas = await parse_detail(await res)
-    print(datas)
+    insert_data(datas)
 
 async def parse_detail(res):
     datas = []
@@ -59,11 +62,12 @@ async def parse_detail(res):
             tags = ret['tags']
             comments = ret['comments']
             href = ret['url']
-            catelog = ret['catelog']
+            catelog = ret['catalog']
         data = {
             'book_id': bid, 'book_name': name, 'book_author': author, 'book_cover': cover, 'book_score': score,
             'book_isbn': isbn, 'book_page': page_number, 'price': price, 'publisher': publisher,
-            'pubtime': pubtime, 'book_tags': tags, 'comments': comments, 'detail_url': url, 'outurl': href
+            'pubtime': pubtime, 'book_tags': tags, 'comments': comments, 'detail_url': url, 'outurl': href,
+            'introduction': introduction, 'catelog': catelog
         }
         datas.append(data)
     return datas
