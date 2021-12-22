@@ -1,20 +1,27 @@
 import re
 import sys
 import time
-
 from dateparser import parse
 import aiohttp
 import asyncio
 import logging
 import elasticsearch
-import time
+
 logging.basicConfig(level=logging.INFO)
 logger = logging
 index_name = 'book'
 header = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
 }
+create_body = {
+    "mappings": {
+        "book": {
+            "analyzer": "ik_max_word"
+        }
+    }
+}
 es = elasticsearch.Elasticsearch()
+pg = 1
 
 def create_index():
     logger.info('正在创建索引... ...')
@@ -35,8 +42,9 @@ def get_standard_pubtime(pub_time):
     if pubtime:
         return str(pubtime).split(' ')[0]
     else:
-        logger.info('%s 时间格式不对！' % pub_time)
-        raise TypeError
+        # logger.info('%s 时间格式不对！' % pub_time)
+        pubtime = '————'
+        return pubtime
 
 def insert_data(datas):
     for data in datas:
@@ -45,12 +53,15 @@ def insert_data(datas):
 
 async def request_book(page):
     logger.info('正在爬取第%s页' % page)
-    url = 'https://spa5.scrape.center/api/book/?limit=18&offset=%s' % (page - 1) * 18
+    url = 'https://spa5.scrape.center/api/book/?limit=18&offset=%s' % ((page - 1) * 18)
     res = await do_request(url)
-    datas = await parse_detail(await res)
-    insert_data(datas)
+    datas = await parse_detail(res, page)
+    for data in datas:
+        print(data['book_id'], data['book_name'], data['outurl'])
+    # insert_data(datas)
 
-async def parse_detail(res):
+async def parse_detail(res, page):
+    logger.info('开始解析第%s页的数据' % page)
     datas = []
     for item in res['results']:
         bid = item['id']
@@ -58,20 +69,20 @@ async def parse_detail(res):
         author = ",".join(item['authors']).replace('\n', '').replace('\t', '').replace('\r', '').replace(' ', '')
         cover = item['cover']
         score = item['score']
+        logger.info('%s开始解析... ...' % name)
         url = 'https://spa5.scrape.center/api/book/' + bid
-        response = await do_request(url)
-        ret = await response
-        if True:
-            introduction = ret['introduction']
-            isbn = ret['isbn']
-            page_number = ret['page_number']
-            price = ret['price']
-            publisher = ret['publisher']
-            pubtime = get_standard_pubtime(ret['published_at'])
-            tags = ret['tags']
-            comments = ret['comments']
-            href = ret['url']
-            catelog = ret['catalog']
+        print(url)
+        ret = await do_request(url)
+        introduction = ret['introduction']
+        isbn = ret['isbn']
+        page_number = ret['page_number']
+        price = ret['price']
+        publisher = ret['publisher']
+        pubtime = get_standard_pubtime(ret['published_at'])
+        tags = ret['tags']
+        comments = ret['comments']
+        href = ret['url']
+        catelog = ret['catalog']
         data = {
             'book_id': bid, 'book_name': name, 'book_author': author, 'book_cover': cover, 'book_score': score,
             'book_isbn': isbn, 'book_page': page_number, 'price': price, 'publisher': publisher,
@@ -79,22 +90,32 @@ async def parse_detail(res):
             'introduction': introduction, 'catelog': catelog
         }
         datas.append(data)
+    logger.info('=======%s页的数据解析成功!=========' % page)
+    logger.info(len(datas))
+    logger.info('=======%s页的数据解析成功!=========' % page)
     return datas
 
 async def do_request(url):
     session = aiohttp.ClientSession()
-    response = await session.get(url, headers=header)
-    await session.close()
-    return response.json()
-
+    async with session.get(url, headers=header) as response:
+        await session.close()
+        print(response.json())
+        print(await response.json())
+        return await response.json()
 
 if __name__ == '__main__':
-    create_index()
+    # create_index()
     loop = asyncio.get_event_loop()
-    for page in range(1, 503):
-        task = asyncio.ensure_future(request_book(page))
-        loop.run_until_complete(task)
+    # 开启10个协程
+    tasks = []
+    while pg < 5:
+        for i in range(10):
+            task = asyncio.ensure_future(request_book(pg))
+            pg += 1
+            tasks.append(task)
+        loop.run_until_complete(asyncio.wait(tasks))
 
+# ------------------------------------------------------------------------
     #   async with aiohttp.ClientSession() as session:
     #     async with session.get(url, params=param) as response:
     #         print(await response.text())
