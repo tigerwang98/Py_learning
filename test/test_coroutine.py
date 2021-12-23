@@ -9,16 +9,10 @@ import elasticsearch
 
 logging.basicConfig(level=logging.INFO)
 logger = logging
-index_name = 'book'
+index_name = 'bookstore'
+index_type = 'book'
 header = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
-}
-create_body = {
-    "mappings": {
-        "book": {
-            "analyzer": "ik_max_word"
-        }
-    }
 }
 es = elasticsearch.Elasticsearch()
 pg = 1
@@ -58,7 +52,7 @@ async def request_book(page):
     datas = await parse_detail(res, page)
     for data in datas:
         print(data['book_id'], data['book_name'], data['outurl'])
-    # insert_data(datas)
+    insert_data(datas)
 
 async def parse_detail(res, page):
     logger.info('开始解析第%s页的数据' % page)
@@ -71,7 +65,6 @@ async def parse_detail(res, page):
         score = item['score']
         logger.info('%s开始解析... ...' % name)
         url = 'https://spa5.scrape.center/api/book/' + bid
-        print(url)
         ret = await do_request(url)
         introduction = ret['introduction']
         isbn = ret['isbn']
@@ -89,12 +82,20 @@ async def parse_detail(res, page):
             'pubtime': pubtime, 'book_tags': tags, 'comments': comments, 'detail_url': url, 'outurl': href,
             'introduction': introduction, 'catelog': catelog
         }
+        if pubtime == '————':
+            print('catch:', name)
         datas.append(data)
-    logger.info('=======%s页的数据解析成功!=========' % page)
-    logger.info(len(datas))
-    logger.info('=======%s页的数据解析成功!=========' % page)
     return datas
 
+async def do_request(url):
+    # connector = aiohttp.TCPConnector(limit=50)
+    timeout = aiohttp.ClientTimeout(total=100)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
+        async with session.get(url, headers=header) as response:
+            if response.status == 200:
+                return await response.json()
+'''
+错误代码
 async def do_request(url):
     session = aiohttp.ClientSession()
     async with session.get(url, headers=header) as response:
@@ -102,18 +103,21 @@ async def do_request(url):
         print(response.json())
         print(await response.json())
         return await response.json()
+'''
 
 if __name__ == '__main__':
+    logger.info('start_time: %s' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
     # create_index()
     loop = asyncio.get_event_loop()
     # 开启10个协程
     tasks = []
-    while pg < 5:
+    while pg < 50:
         for i in range(10):
             task = asyncio.ensure_future(request_book(pg))
             pg += 1
             tasks.append(task)
         loop.run_until_complete(asyncio.wait(tasks))
+    logger.info('end_time: %s' % time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
 
 # ------------------------------------------------------------------------
     #   async with aiohttp.ClientSession() as session:
