@@ -25,9 +25,9 @@ logging.basicConfig(level=logging.INFO)
 class DriverDouYin():
     def __init__(self, driver_path, start_url):
         self.save_path = {
-            'hidden_js': 'C:\\Users\\123\\Desktop\\Py_learing\\test\\douyin_selenium\\hidden_js\\stealth.min.js',
-            'bg_img_path': 'C:\\Users\\123\\Desktop\\Py_learing\\test\\douyin_selenium\\capture_imgs\\backgroudPicture.png',
-            'slide_img_path': 'C:\\Users\\123\\Desktop\\Py_learing\\test\\douyin_selenium\\capture_imgs\\slidePicture.png',
+            'hidden_js': 'C:\\Users\\Administrator\\Desktop\\Py_learning\\test\\douyin_selenium\\hidden_js\\stealth.min.js',
+            'bg_img_path': 'C:\\Users\\Administrator\\Desktop\\Py_learning\\test\\douyin_selenium\\capture_imgs\\backgroudPicture.png',
+            'slide_img_path': 'C:\\Users\\Administrator\\Desktop\\Py_learning\\test\\douyin_selenium\\capture_imgs\\slidePicture.png',
         }
         self.chrome_driverPath = driver_path
         self.url = start_url
@@ -213,7 +213,7 @@ class ParsePageSource():
 
 if __name__ == '__main__':
     logging.info('抖音爬虫开始！')
-    spider = DriverDouYin(r'C:/Users/123/Desktop/Py_learing/chromedriver_win32/chromedriver.exe', r'https://www.douyin.com/')
+    spider = DriverDouYin(r'C:\\Users\\Administrator\\Desktop\\Py_learning\\chromedriver_win32\\chromedriver.exe', r'https://www.douyin.com/')
     bg_img_path, slide_img_path = spider.get_img_info()
     move_distance = spider.get_validate_param(bg_img_path, slide_img_path)
     page_source = spider.drag_and_drop(move_distance)

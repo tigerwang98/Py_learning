@@ -5,15 +5,25 @@
 @author= wanghu
 @create_time = 2021/6/28 16:49
 """
-import pymysql,time
-conn = pymysql.connect(host='localhost', user='root', password='123456', database='test')
-cur = conn.cursor()
+import requests
 
-item = [0, 0, '测试题目', '作者', '测试时间', '测试链接', '测试坐标', 'None']
-sql = '''insert into stang_bid_new(area_id, cate_id, title, author, pubtime, outurl, location, info, add_time) values ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s")'''
-sql = sql % (item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7], int(time.time()))
+url = 'https://login3.scrape.center/api/login'
+header = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
+    'ontent-Type': 'application/json;charset=UTF-8'
+}
+param = {
+    'username': 'admin',
+    'password': 'admin'
+}
+res = requests.post(url=url, headers=header, data=param)
 
-cur.execute(sql)
-conn.commit()
-cur.close()
-conn.close()
+param_token = res.json()['token']
+
+h = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
+    'Authorization': 'jwt ' + param_token
+}
+detail_url = r'https://login3.scrape.center/api/book/?limit=18&offset=0'
+ret = requests.get(detail_url, headers=h)
+print(ret.text)

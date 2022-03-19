@@ -1,0 +1,66 @@
+{
+  "spider": "Sichuan_ggzy",
+  "home": "http://ggzyjy.sc.gov.cn/",
+  "settings": {
+    "start_urls": ["http://ggzyjy.sc.gov.cn/"],
+    "allowed_domains": ["ggzyjy.sc.gov.cn"],
+    "rules": [
+      {
+        "link_extractor": {"allow": "xwzx/(\\w+/){0,2}.*more", "deny": "\\w-\\w"},
+        "follow": true,
+        "callback": "generate_page"
+      },
+      {
+        "link_extractor": {"allow":  "jyxx/transactionInfo"},
+        "follow": true,
+        "callback": "generate_page"
+      },
+      {
+        "link_extractor": {"allow": "ycpb/moreinfomenu"},
+        "follow": true,
+        "callback": "parse_item"
+      },
+      {
+        "link_extractor": {"allow": "bszn/bsznnotice"},
+        "follow": true,
+        "callback": "generate_page"
+      },
+      {
+        "link_extractor": {"allow": "zcfg/moreinfo"},
+        "follow": true,
+        "callback": "generate_zcfg_page"
+      },
+      {
+        "link_extractor": {"allow": "cyzdxm/transactionInfocyzd"},
+        "follow": true,
+        "callback": "generate_page"
+      },
+      {
+        "link_extractor": {"allow": "#/secondHome.html"},
+        "follow": true,
+        "callback": "generate_pbzjk_page"
+      },
+      {
+        "link_extractor": {"allow": "cxgl/sincerity-creditinfo"},
+        "follow": true,
+        "callback": "generate_cxjd"
+      },
+      {
+        "link_extractor": {"allow": "(\\w+/)+(\\w+-\\w+)+.html"},
+        "follow": true,
+        "callback": "parse_detail_item"
+      }
+    ],
+    "item": {
+      "class": "ScrapyFaguiItem",
+      "loader": "DetailItemLoader",
+      "attrs": {
+        "title": {
+          "method": "xpath",
+          "arg": ""
+        }
+      }
+    }
+  }
+}
+
