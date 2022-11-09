@@ -18,13 +18,14 @@ from openpyxl import Workbook
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment,Side,Border
 import os
+from url_test.Zhiyiyun.Config import *
 logging.basicConfig(level=logging.INFO)
 
 
 class ZhiYiYun():
     def __init__(self, date):
         self.date = date
-        self.file_path = r'C:\Users\123\Desktop\贵安诊所门诊日志\贵安诊所_%s.xlsx' % self.date
+        self.file_path = BASE_FILE_PATH + '\贵安诊所门诊日志\贵安诊所_%s.xlsx' % self.date
         self.createExcel()
         self.fp = load_workbook(filename=self.file_path)
         self.conn, self.cur, self.redis_conn = self.initDatabase()
@@ -262,14 +263,12 @@ class ZhiYiYun():
         logging.info('%s 插入成功!' % data['patientName'])
 
     def initDatabase(self):
-        conn = pymysql.connect(host='localhost', user='root', password='123456', db='test', charset='utf8')
-        redis_conn = Redis(host='localhost', password='', db='7', port=6379)
+        conn = pymysql.connect(host=MYSQL_SERVER, port=MYSQL_PORT, user=MYSQL_USER, password=MYSQL_PASSWORD, db=MYSQL_DB)
+        redis_conn = Redis(host=REDIS_SERVER, port=REDIS_port, username=REDIS_USER, password=REDIS_PASSWORD, db=REDIS_DB)
         cursor = conn.cursor()
         return conn, cursor, redis_conn
 
     def createExcel(self):
-        if not os.path.exists("\\".join(self.file_path.split('\\')[:-1])):
-           os.mkdir("\\".join(self.file_path.split('\\')[:-1]))
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "贵安诊所_%s.xlsx" % self.date
@@ -345,8 +344,10 @@ def generate_date(start_date, end_date):
 
 
 if __name__ == '__main__':
-    start_date = input('请输入起始时间:')
-    end_date = input('请输入截止时间:')
+    # start_date = input('请输入起始时间:')
+    # end_date = input('请输入截止时间:')
+    start_date = '2022-11-01'
+    end_date = '2022-11-09'
     for date in generate_date(start_date, end_date):
         t = ZhiYiYun(date)
         t.run()
