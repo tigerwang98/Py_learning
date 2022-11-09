@@ -1,1 +1,4 @@
 files/*
+*.pyc
+*.pyd
+*.dll
